@@ -1,0 +1,49 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        
+
+        {
+            "name": "tranquil_mindv1",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "tranquil_mindv1 (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "tranquil_mindv1 (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "Flutter (Pixel_3a_API_34_extension_level_7_x86_64)",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "Pixel_3a_API_34_extension_level_7_x86_64",
+            "flutterMode": "debug"
+        },
+        {
+            "name": "Flutter Web - Chrome (HTML Renderer)",
+            "request": "launch",
+            "type": "dart",
+            "program": "${workspaceFolder}/${home_page}.dart",
+            "args": [
+                "--web-runner",
+                "chrome",
+                "--web-port",
+                "5001",
+                "--web-renderer",
+                "html"
+            ],
+            "flutterMode": "debug"
+        }
+    ]
+}

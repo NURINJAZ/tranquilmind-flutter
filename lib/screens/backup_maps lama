@@ -1,0 +1,112 @@
+import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tranquil_mindv1/providers/dio_provider.dart';
+
+class MapScreen extends StatefulWidget {
+  @override
+  State<MapScreen> createState() => MapScreenState();
+}
+
+class MapScreenState extends State<MapScreen> {
+  late GoogleMapController mapController;
+  LatLng _initialLocation = LatLng(2.224650, 102.454896);
+  LatLng? _adminLocation;
+  final DioProvider dioProvider = DioProvider();
+
+  @override
+  void initState() {
+    super.initState();
+    _requestPermission();
+    _fetchAdminLocation();
+  }
+
+  void _requestPermission() async {
+    var status = await Permission.location.status;
+    if (status.isDenied || status.isRestricted || status.isPermanentlyDenied) {
+      status = await Permission.location.request();
+    }
+    if (status.isGranted) {
+      // Permission granted
+    } else {
+      // Handle the case where permission is not granted
+    }
+  }
+
+  void _fetchAdminLocation() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    String? doctorId = prefs.getString('doctor_id');
+
+    print('Retrieved token: $token');
+    print('Retrieved doctor ID: $doctorId');
+
+    if (token != null && doctorId != null) {
+      print(
+          'Fetching admin location with token: $token and doctorId: $doctorId');
+
+      try {
+        var response = await dioProvider.getAdminLocation(token, doctorId);
+
+        if (response != null && response is Map<String, dynamic>) {
+          double latitude = double.tryParse(response['latitude'] ?? '') ?? 0.0;
+          double longitude =
+              double.tryParse(response['longitude'] ?? '') ?? 0.0;
+
+          setState(() {
+            _adminLocation = LatLng(latitude, longitude);
+            print('Admin location fetched: $_adminLocation');
+            _moveToAdminLocation();
+          });
+        } else {
+          print('Invalid response format or null response');
+        }
+      } catch (e) {
+        print('Error fetching admin location: $e');
+      }
+    } else {
+      print('Token or doctor ID not found');
+    }
+  }
+
+  void _moveToAdminLocation() {
+    if (_adminLocation != null) {
+      mapController.animateCamera(
+        CameraUpdate.newLatLng(_adminLocation!),
+      );
+    }
+  }
+
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+    if (_adminLocation != null) {
+      _moveToAdminLocation();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Google Maps Demo'),
+        backgroundColor: Colors.green[700],
+      ),
+      body: GoogleMap(
+        onMapCreated: _onMapCreated,
+        initialCameraPosition: CameraPosition(
+          target: _adminLocation ?? _initialLocation,
+          zoom: 11.0,
+        ),
+        markers: {
+          if (_adminLocation != null)
+            Marker(
+              markerId: MarkerId('adminLocation'),
+              icon: BitmapDescriptor.defaultMarker,
+              position: _adminLocation!,
+            ),
+        },
+      ),
+    );
+  }
+}
