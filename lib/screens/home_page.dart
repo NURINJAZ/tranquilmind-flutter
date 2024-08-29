@@ -89,7 +89,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       Config.spaceMedium,
                       const Text(
-                        'Self-Help Tools',
+                        'Self-Help Tools123',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
